@@ -2115,7 +2115,8 @@ Test.panel.TreeGrid = function(config) {
         Test.Options.renderCheckbox("showDisabled", "Show disabled"),
         Test.Options.renderCheckbox("collapseAll", "Collapse all"),
         Test.Options.renderCheckbox("expandResults", "Expand results"),
-        Test.Options.renderCheckbox("disableTryCatch", "No Jazzman try/catch")
+        Test.Options.renderCheckbox("disableTryCatch", "No Jazzman try/catch"),
+        Test.Options.renderCheckbox("breakOnFail", "Break on fail")
     ];
     
     toolbar.push(Test.Options.renderCheckbox("disableLeakChecks", "Disable leak checks"));

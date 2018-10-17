@@ -17,6 +17,10 @@ addGlobal([
         jasmine.CATCH_EXCEPTIONS = false;
     }
     
+    if (options.breakOnFail) {
+        jasmine.BREAK_ON_FAIL = true;
+    }
+    
     if (options.debug) {
         jasmine.DEBUG_ON_ERROR = true;
     }
