@@ -353,6 +353,13 @@ class Task {
                     delete message.actual;
                 }
                 
+                if (this.chunks > 0) {
+                    message.details = [
+                        (message.details || ''),
+                        `Chunk: ${this.chunk}/${this.chunks}`
+                    ].join(' ');
+                }
+                
                 break;
         }
         
