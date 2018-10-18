@@ -9,9 +9,7 @@ addGlobal([
 // We need this early on (but after Ext is loaded) so that specs and suites could check
 // various conditions and disable themselves if necessary.
 (function() {
-    // The roundabout way of passing options is to avoid assigning objects across iframes.
-    // Older IEs freak out mightily over that, but assigning primitives is OK.
-    var options = jasmine._options = JSON.parse(window.__UNIT_TESTING__ || '{}');
+    var options = top.Test.Options.get();
     
     if (options.disableTryCatch) {
         jasmine.CATCH_EXCEPTIONS = false;
@@ -23,10 +21,6 @@ addGlobal([
     
     if (options.debug) {
         jasmine.DEBUG_ON_ERROR = true;
-    }
-    
-    if (options.logElementGarbage) {
-        jasmine.LOG_ELEMENT_GARBAGE = true;
     }
     
     if (!options.disableLeakChecks) {

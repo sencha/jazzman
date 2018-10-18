@@ -1623,10 +1623,8 @@ Test.SandBoxImpl.prototype.createIframe = function() {
         win.id = 'sandboxWindow';
         
         // We need a reliable way to detect if we're running under the test harness
-        // while executing Ext startup code; we need to know what options were passed
-        // to the runner as well. IE9- can't access objects cross-iframe so we work
-        // around that.
-        win.__UNIT_TESTING__ = JSON.stringify(options);
+        // while executing Ext startup code.
+        win.__UNIT_TESTING__ = true;
         
         // start-tests.js needs a way to detect that remote driver is available.
         // Cmd is legacy API compatible with Sencha Test.
