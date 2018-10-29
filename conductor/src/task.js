@@ -209,7 +209,7 @@ class Task {
                     
                     failed = haveFinished < wantFinished;
                     
-                    if (failed) {
+                    if (failed && this.enforceTestPlan) {
                         const planFailed = this.formatFailedPlan(wantFinished, haveFinished);
                         const runnerFinished = output.pop();
                         
@@ -375,6 +375,11 @@ class Task {
     }
     
     formatFailedPlan(wantSpecs, haveSpecs) {
+        const { sauceLabs } = this;
+        
+        const details =
+            (sauceLabs && sauceLabs.user ? `https://saucelabs.com/beta/tests/${this.id}` : '');
+        
         const messages = [{
             type: 'testSuiteStarted',
             topSuite: true,
@@ -386,8 +391,7 @@ class Task {
             type: 'testFailed',
             name: 'should execute all test specs',
             message: `Expected ${wantSpecs} specs to finish but got ${haveSpecs}`,
-            ...(this.sauceLabs && this.sauceLabs.user
-                    ? { details: `https://saucelabs.com/beta/tests/${this.id}` } : {}),
+            ...(details ? { details } : {}),
         }, {
             type: 'testFinished',
             name: 'should execute all test specs',
@@ -432,18 +436,20 @@ class Task {
         this.finished = true;
         
         if (error) {
-            const totalSpecs = this.finishPlan  ? this.finishPlan.totalSpecs
-                             : this.initialPlan ? this.initialPlan.totalSpecs
-                             :                    0
-                             ;
-            
-            const finishedSpecs
-                = this.finishPlan ? this.finishPlan.finishedSpecs : this.specsFinished;
-            
-            // It is perfectly possible that a driver error happened after the browser
-            // has finished test run successfully, so check before failing
-            if (finishedSpecs < totalSpecs) {
-                await this.printMessage(this.formatFailedPlan(totalSpecs, finishedSpecs));
+            if (this.enforceTestPlan) {
+                const totalSpecs = this.finishPlan  ? this.finishPlan.totalSpecs
+                                 : this.initialPlan ? this.initialPlan.totalSpecs
+                                 :                    0
+                                 ;
+                
+                const finishedSpecs
+                    = this.finishPlan ? this.finishPlan.finishedSpecs : this.specsFinished;
+                
+                // It is perfectly possible that a driver error happened after the browser
+                // has finished test run successfully, so check before failing
+                if (finishedSpecs < totalSpecs) {
+                    await this.printMessage(this.formatFailedPlan(totalSpecs, finishedSpecs));
+                }
             }
             
             await this.logError(`Task ${this.name} finishing with an error, ${prefix}`, error);

@@ -42,7 +42,6 @@ const parseJsonOpts = (str, defaults) => {
 };
 
 const options = [
-    // TODO Validate
     ['--name <run name>', 'Name for this test run', /.*/, 'Test run'],
     ['--build <build #>', 'Build number to display in run stats (optional)', /.*/],
     ['--tag <tag>', 'Session tag (optional, can be repeated)', parseArgs, defaults.sessionTags],
@@ -69,6 +68,7 @@ const options = [
         defaults.sauceConnect.timeout],
     ['--session-options <json>', 'Additional session options (JSON string)',
         parseJsonOpts, defaults.sessionOptions],
+    ['--enforce-test-plan', 'Track planned vs executed test specs and fail on mismatch'],
 ];
 
 module.exports = (printStdout, printStderr) => {

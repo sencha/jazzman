@@ -1623,10 +1623,8 @@ Test.SandBoxImpl.prototype.createIframe = function() {
         win.id = 'sandboxWindow';
         
         // We need a reliable way to detect if we're running under the test harness
-        // while executing Ext startup code; we need to know what options were passed
-        // to the runner as well. IE9- can't access objects cross-iframe so we work
-        // around that.
-        win.__UNIT_TESTING__ = JSON.stringify(options);
+        // while executing Ext startup code.
+        win.__UNIT_TESTING__ = true;
         
         // start-tests.js needs a way to detect that remote driver is available.
         // Cmd is legacy API compatible with Sencha Test.
@@ -2115,7 +2113,8 @@ Test.panel.TreeGrid = function(config) {
         Test.Options.renderCheckbox("showDisabled", "Show disabled"),
         Test.Options.renderCheckbox("collapseAll", "Collapse all"),
         Test.Options.renderCheckbox("expandResults", "Expand results"),
-        Test.Options.renderCheckbox("disableTryCatch", "No Jazzman try/catch")
+        Test.Options.renderCheckbox("disableTryCatch", "No Jazzman try/catch"),
+        Test.Options.renderCheckbox("breakOnFail", "Break on fail")
     ];
     
     toolbar.push(Test.Options.renderCheckbox("disableLeakChecks", "Disable leak checks"));
