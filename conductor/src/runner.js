@@ -5,7 +5,6 @@ const Task = require('./task');
 
 module.exports = (options, printStdout, printStderr) => {
     return async (app) => {
-        // Apparently passing abort reason to tasks is too advanced for d3-queue...
         let queue, abortReason;
         
         const abortQueue = (cb) => {
@@ -18,7 +17,7 @@ module.exports = (options, printStdout, printStderr) => {
             if (typeof cb === 'function') {
                 cb();
             }
-        }
+        };
         
         // Not doing this might leave the process hanging by pid
         // until killed dead. We only want to catch signals to ensure
@@ -35,10 +34,7 @@ module.exports = (options, printStdout, printStderr) => {
             abortQueue(_cleanupSignals);
         };
         
-        // This is exactly as kludgy as it looks but passing the signal name
-        // as an argument to handler is apparently too advanced for Node.js.
-        // We *do* need to log the signal name, it might be useful for
-        // troubleshooting test runs.
+        // We need to log the signal name, it might be useful for troubleshooting test runs.
         const _hupHandler = () => { _handleSignal('SIGHUP') };
         const _intHandler = () => { _handleSignal('SIGINT') };
         const _termHandler = () => { _handleSignal('SIGTERM') };
@@ -47,9 +43,7 @@ module.exports = (options, printStdout, printStderr) => {
         process.on('SIGINT', _intHandler);
         process.on('SIGTERM', _termHandler);
         
-        // We want options to be mutable. It's just easier to handle side effects
-        // than jump through hoops while tossing around immutable objects,
-        // all for the sake of f(un|i)ctional purity.
+        // Options object is mutable by design.
         options.printStdout = printStdout;
         options.printStderr = printStderr;
         options.abort = abortQueue;
@@ -67,7 +61,7 @@ module.exports = (options, printStdout, printStderr) => {
         
         const taskBySession = {};
         
-        server.post(sessionURI, async(req, res) => {
+        server.post(sessionURI, async (req, res) => {
             const { sessionId, messageType } = req.params;
             const task = taskBySession[sessionId];
             
@@ -89,6 +83,7 @@ module.exports = (options, printStdout, printStderr) => {
             }
             else {
                 const success = await task.processMessages(req.body);
+                
                 res.sendStatus(success ? 200 : 500);
             }
         });
@@ -100,8 +95,7 @@ module.exports = (options, printStdout, printStderr) => {
                 
             delete options.abort;
             
-            // D3 queue is synchronous so we have to work around it. I swear one of these days
-            // I will have to write my own task queue, with blackjack and hookers!
+            // D3 queue is synchronous so we have to work around it.
             const aborted = [];
             
             const runQueue = async (desc, chunks, queueCallback) => {
@@ -168,11 +162,11 @@ module.exports = (options, printStdout, printStderr) => {
                             // task.abort is async, it returns a Promise
                             abort: () => aborted.push(task.abort(abortReason))
                         };
-                    })
+                    });
                 });
                 
                 queue.awaitAll(queueCallback);
-            }
+            };
             
             queue = Queue.queue(options.concurrency);
             
@@ -204,8 +198,7 @@ module.exports = (options, printStdout, printStderr) => {
                             exitCode = 1;
                         }
                         else {
-                            await printStdout(`Queue completed ${completed} jobs `+
-                                              `of total ${total}.`);
+                            await printStdout(`Queue completed ${completed} jobs of total ${total}.`);
                         }
                         
                         const res = (results || []).reduce(
@@ -230,5 +223,5 @@ module.exports = (options, printStdout, printStderr) => {
                 }
             });
         });
-    }
+    };
 };

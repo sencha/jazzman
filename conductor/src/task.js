@@ -3,13 +3,13 @@
 const webdriver = require('selenium-webdriver');
 const request = require('request-promise-native');
 
-const tcEscape = (text) => 
+const tcEscape = (text) =>
     text.replace(/\|/g, '||')
         .replace(/\]/g, "|]")
         .replace(/\[/g, "|[")
         .replace(/\r/g, "|r")
         .replace(/\n/g, "|n")
-        .replace(/\'/g, "|'");
+        .replace(/'/g, "|'");
 
 class Task {
     constructor(testUnit) {
@@ -21,8 +21,8 @@ class Task {
     async setup(finishCallback) {
         this.finishCallback = finishCallback;
         
-        const driverBuilder
-            = new webdriver.Builder().withCapabilities(this.browserCapabilities);
+        const driverBuilder =
+            new webdriver.Builder().withCapabilities(this.browserCapabilities);
         
         if (this.hub != null) {
             driverBuilder.usingServer(this.hub);
@@ -239,7 +239,7 @@ class Task {
         }
         
         return true;
-    };
+    }
 
     async driverCommand(command) {
         // See above
@@ -294,10 +294,11 @@ class Task {
                 delete message.plan;
                 
                 message.message = `Task ${this.name}: Test runner started` +
-                    (plan ? ` with ${plan.enabledSpecs} enabled specs, ` +
+                    (plan
+                        ? ` with ${plan.enabledSpecs} enabled specs, ` +
                             `${plan.disabledSpecs} disabled specs (${plan.totalSpecs} total)`
-                          : ''
-                     );
+                        : ''
+                    );
                 break;
             
             case 'testRunnerFinished':
@@ -305,11 +306,12 @@ class Task {
                 delete message.plan;
                 
                 message.message = `Task ${this.name}: Test runner finished` +
-                    (plan ? `: ${plan.finishedSpecs} specs finished out of ` +
+                    (plan
+                        ? `: ${plan.finishedSpecs} specs finished out of ` +
                             `${plan.enabledSpecs} enabled, skipped ${plan.disabledSpecs} ` +
                             `disabled specs (${plan.totalSpecs} total)`
-                          : ''
-                     );
+                        : ''
+                    );
                 break;
             
             case 'dependencyLoadStarted':
@@ -437,13 +439,15 @@ class Task {
         
         if (error) {
             if (this.enforceTestPlan) {
+                /* eslint-disable indent */
                 const totalSpecs = this.finishPlan  ? this.finishPlan.totalSpecs
                                  : this.initialPlan ? this.initialPlan.totalSpecs
                                  :                    0
                                  ;
+                /* eslint-enable indent */
                 
-                const finishedSpecs
-                    = this.finishPlan ? this.finishPlan.finishedSpecs : this.specsFinished;
+                const finishedSpecs =
+                    this.finishPlan ? this.finishPlan.finishedSpecs : this.specsFinished;
                 
                 // It is perfectly possible that a driver error happened after the browser
                 // has finished test run successfully, so check before failing
@@ -500,6 +504,6 @@ class Task {
             });
         }
     }
-};
+}
     
 module.exports = Task;

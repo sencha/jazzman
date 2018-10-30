@@ -5,7 +5,7 @@ const path = require('path');
 
 const chunkify = (options) => {
     const runName = options.name;
-    const { printStdout, printStderr, build, tags } = options;
+    const { build, tags } = options;
     const topPath = path.dirname(options.testSuites);
     
     return (suite) => {
@@ -16,6 +16,7 @@ const chunkify = (options) => {
             caps = JSON.parse(text);
         }
         
+        // eslint-disable-next-line no-unused-vars
         let totalChunks = 0;
         const suiteChunks = [];
         
@@ -40,7 +41,7 @@ const chunkify = (options) => {
                 // 1-based "x of y" is much easier to comprehend than
                 // technically correct 0-based
                 const taskName = `${buildName} ${suite.name}: ${displayName}` +
-                                 (chunks > 0 ? ` ${chunk+1} of ${chunks}` : '');
+                                 (chunks > 0 ? ` ${chunk + 1} of ${chunks}` : '');
                 
                 suiteChunks.push({
                     page: cap.page || suite.page,
@@ -87,13 +88,7 @@ const chunkify = (options) => {
         });
         
         return suiteChunks;
-//         return chunks.sort((a, b) => {
-//             const weightA = a.weight || 0;
-//             const weightB = b.weight || 0;
-//             
-//             return weightA > weightB ? 1 : weightB > weightA ? -1 : 0;
-//         });
-    }
+    };
 };
 
 module.exports = async (options) => {

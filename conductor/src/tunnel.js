@@ -30,7 +30,7 @@ module.exports = (app, options) => {
                 '-k', options.sauceLabs.key,
                 '-t', options.publicHost,
                 '--readyfile', pid_file,
-                '-l', '/dev/null', // SauceConnect is _verbose_
+                '-l', '/dev/null', // SauceConnect is verbose to the point of slowing down!
                 ...(options.sauceConnect.args || []), // allow to override from command line
             ],
             
@@ -66,8 +66,8 @@ module.exports = (app, options) => {
     
     let sauceConnect;
     
-    const appListen = app.listen,
-          appClose = app.close;
+    const appListen = app.listen;
+    const appClose = app.close;
     
     app.listen = async (port, cb) => {
         try {

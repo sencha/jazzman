@@ -184,6 +184,7 @@ topSuite("Ext.jazzman.Order", false, function() {
                 // This is going to time out after 1 invocation
                 waitsFor(function() {
                     order.push('foo it 2-2');
+                    
                     return false;
                 }, 'foo 2 to run', 1, 10);
                 
@@ -202,6 +203,7 @@ topSuite("Ext.jazzman.Order", false, function() {
                 // This is going to time out after 2 invocations
                 waitsFor(function() {
                     order.push('foo it 3-2');
+                    
                     return false;
                 }, 'foo 3 to run', 20, 10);
                 
@@ -237,6 +239,7 @@ topSuite("Ext.jazzman.Order", false, function() {
                 it("bar 1", function() {
                     waitsFor(function() {
                         order.push('bar it 1-2');
+                        
                         return true;
                     }, 'bar 1 to run', 10, 10);
                     
@@ -252,6 +255,7 @@ topSuite("Ext.jazzman.Order", false, function() {
                     
                     waitsFor(function() {
                         order.push('bar it 2-2');
+                        
                         return this.counter++;
                     }, 'bar 1 to run', 100, 10);
                     
@@ -340,6 +344,7 @@ topSuite("Ext.jazzman.Order", false, function() {
                         // This is going to kick in after waitsForSpy block was executed
                         // for the first time but before it timed out
                         var setTimeout = jasmine._setTimeout;
+                        
                         setTimeout(function() {
                             order.push('qux it 3-3');
                             spy();
