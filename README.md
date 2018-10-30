@@ -19,3 +19,9 @@ acquired from a cloud provider (we use SauceLabs internally at Sencha).
 * Node based conductor to run CI tests in the cloud
 
 ## TODO
+
+Some features we plan for the future:
+
+* Better Jasmine 2.x API support
+* Support for non-browser environments
+* NPM package for easier redistribution
