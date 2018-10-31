@@ -5,6 +5,7 @@
 
 var Test = Test || {};
 
+/* eslint-disable vars-on-top */
 (function() {
 'use strict';
 
@@ -30,20 +31,21 @@ Test.STATUS_UPDATE_INTERVAL = 100;
 (function() {
     var objectPrototype = Object.prototype,
         toString = objectPrototype.toString,
-        enumerables = ['valueOf', 'toLocaleString', 'toString', 'constructor'];
+        enumerables = ['valueOf', 'toLocaleString', 'toString', 'constructor'],
+        enumerable; // eslint-disable-line no-unused-vars
     
-    for (var i in { toString: 1 }) {
+    for (enumerable in { toString: 1 }) {
         enumerables = null;
     }
     
     Test.apply = function(object, config, defaults) {
+        var i, j, k;
+
         if (defaults) {
             Test.apply(object, defaults);
         }
 
         if (object && config && typeof config === 'object') {
-            var i, j, k;
-
             for (i in config) {
                 object[i] = config[i];
             }
@@ -51,6 +53,7 @@ Test.STATUS_UPDATE_INTERVAL = 100;
             if (enumerables) {
                 for (j = enumerables.length; j--;) {
                     k = enumerables[j];
+                    
                     if (config.hasOwnProperty(k)) {
                         object[k] = config[k];
                     }
@@ -71,7 +74,9 @@ Test.STATUS_UPDATE_INTERVAL = 100;
             },
             
             isObjectEmpty: function(object) {
-                for (var key in object) {
+                var key;
+                
+                for (key in object) {
                     if (object.hasOwnProperty(key)) {
                         return false;
                     }
@@ -103,9 +108,9 @@ Test.STATUS_UPDATE_INTERVAL = 100;
                 // Avoid mangling &smth; HTML entities by matching only ampersand
                 // characters _not_ followed by either one or more word chars or
                 // # and one or more digits, finished by semicolon
-                return str.replace(/&(?!(?:#\d+|\w+);)/g, '&amp;').
-                           replace(/</g, '&lt;').
-                           replace(/>/g, '&gt;');
+                return str.replace(/&(?!(?:#\d+|\w+);)/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;');
             }
         }
     });
@@ -126,6 +131,7 @@ Test.getCookie = function(name) {
 
         if (item[0] === name) {
             ret = item[1];
+            
             return ret ? unescape(ret) : '';
         }
     }
@@ -159,7 +165,6 @@ Test.setCookie = function(name, value) {
 if (!Function.prototype.bind) {
     Function.prototype.bind = (function() {
         var slice = Array.prototype.slice,
-            proto = Function.prototype,
             emptyArgs = [];
         
         emptyArgs.isEmpty = true;
@@ -171,12 +176,14 @@ if (!Function.prototype.bind) {
             if (args.isEmpty) {
                 return function() {
                     return method.apply(me, arguments);
-                }
+                };
             }
             else {
                 return function() {
-                    return method.apply(me, arguments.length ? args.concat(slice.call(arguments)) : args);
-                }
+                    return method.apply(
+                        me, arguments.length ? args.concat(slice.call(arguments)) : args
+                    );
+                };
             }
         };
     })();
@@ -244,11 +251,13 @@ Test.browser = (function() {
  * @return {Number} The index of item in the array (or -1 if it is not found)
  */
 Test.array.indexOf = function(array, item, from) {
+    var i, length;
+    
     if (array.indexOf) {
         return array.indexOf(item, from);
     }
     
-    var i, length = array.length;
+    length = array.length;
     
     for (i = (from < 0) ? Math.max(0, length + from) : from || 0; i < length; i++) {
         if (array[i] === item) {
@@ -438,7 +447,7 @@ var Remote = Test.Remote = {
                 elementId: domElement.id,
                 keys: keys
             }, callback);
-         }
+        }
     },
 
     // ----------------------------------------------------------------------------
@@ -487,7 +496,7 @@ var Remote = Test.Remote = {
         }
         
         if (typeof callback !== "function") {
-            throw new Exception("Ajax callback argument expected!");
+            throw new Error("Ajax callback argument expected!");
         }
         
         if (typeof data === "function") {
@@ -588,7 +597,7 @@ var Remote = Test.Remote = {
                         Remote._ajax(options, callback);
                     }
                     else {
-                        var err = "Sending test results failed: " + xhr.statusText;
+                        err = "Sending test results failed: " + xhr.statusText;
                         
                         // Uh-oh, probably nothing we can do about this.
                         if (spec) {
@@ -635,7 +644,7 @@ var Remote = Test.Remote = {
     
     _flushQueue: function(callback) {
         var queue = Remote._messageQueue,
-            messages, i;
+            messages, i, status;
         
         messages = queue.slice(0, Remote._queueSize);
         
@@ -645,10 +654,9 @@ var Remote = Test.Remote = {
         
         queue.length = Remote._queueSize = 0;
         
-        var status = messages.length === 1
-                   ? "Sending 1 message to server..."
-                   : "Sending " + messages.length + " messages to server..."
-                   ;
+        status = messages.length === 1
+            ? "Sending 1 message to server..."
+            : "Sending " + messages.length + " messages to server...";
         
         Remote._setStatus(status);
         
@@ -789,10 +797,12 @@ Test.apply(Test.PrettyPrinter.prototype, {
                 this.append(value.toString());
             }
         }
-        catch (e) {}
+        catch (e) {
+            // ignore
+        }
         finally {
             this.ppNestLevel--;
-        };
+        }
     },
     
     append: function(value) {
@@ -812,8 +822,9 @@ Test.apply(Test.PrettyPrinter.prototype, {
             fn.call(
                 scope,
                 property,
-                obj.__lookupGetter__ ? (obj.__lookupGetter__(property) !== undefined && 
-                obj.__lookupGetter__(property) !== null) : false
+                obj.__lookupGetter__
+                    ? (obj.__lookupGetter__(property) !== undefined && obj.__lookupGetter__(property) !== null)
+                    : false
             );
         }
     },
@@ -842,7 +853,6 @@ Test.apply(Test.PrettyPrinter.prototype, {
     
     emitObject: function(obj) {
         var first = true,
-            i = 0,
             indent;
         
         if (this.ppNestLevel > this.MAX_PRETTY_PRINT_DEPTH) {
@@ -876,7 +886,7 @@ Test.apply(Test.PrettyPrinter.prototype, {
             }
             else {
                 if (typeof obj[property] !== "object") {
-                    this.format(obj[property]);   
+                    this.format(obj[property]);
                 }
                 else {
                     this.append("<Object>");
@@ -909,7 +919,8 @@ Test.apply(Test.PrettyPrinter.prototype, {
 /**
  * Creates an HTMLElement.
  * @param {Object/HTMLElement} config Ext DomHelper style element config object.
- * If no tag is specified (e.g., {tag:'input'}) then a div will be automatically generated with the specified attributes.
+ * If no tag is specified (e.g., {tag:'input'}) then a div will be automatically generated
+ * with the specified attributes.
  * @return {HTMLElement} The created HTMLElement
  */
 Test.Dom = function(config) {
@@ -931,6 +942,7 @@ Test.Dom = function(config) {
         child = children[i];
         element.appendChild(new Test.Dom(child));
     }
+    
     delete config.children;
     
     if (config.cls) {
@@ -952,6 +964,7 @@ Test.Dom = function(config) {
         if (!config.hasOwnProperty(property)) {
             continue;
         }
+        
         element[property] = config[property];
     }
 
@@ -985,7 +998,7 @@ Test.Dom.addCls = function(element, cls) {
     split = element.className.split(" ");
     
     for (i = 0, len = split.length; i < len; i++) {
-        if (split[i] == cls) {
+        if (split[i] === cls) {
             return;
         }
     }
@@ -1024,7 +1037,7 @@ Test.Dom.removeCls = function(element, cls) {
         }
     }
     
-    element.className = classArray.join(" ");    
+    element.className = classArray.join(" ");
 };
 
 /**
@@ -1034,7 +1047,7 @@ Test.Dom.removeCls = function(element, cls) {
  * @return {Boolean}
  */
 Test.Dom.hasCls = function(element, cls) {
-    var split, length, classArray, i;
+    var split, length, i;
     
     if (!element.className) {
         return;
@@ -1049,7 +1062,7 @@ Test.Dom.hasCls = function(element, cls) {
         }
     }
     
-    return false;   
+    return false;
 };
 
 /**
@@ -1068,6 +1081,7 @@ Test.Dom.setCls = function(element, cls) {
  */
 Test.Dom.setStyle = function(element, style) {
     var property;
+    
     for (property in style) {
         if (style.hasOwnProperty(property)) {
             element.style[property] = style[property];
@@ -1089,7 +1103,7 @@ Test.OptionsImpl.prototype.getCurrentChunk = function(array, split) {
     var chunkerFn = Test.chunker,
         chunk, numChunks, len, chunks, i, size;
 
-    split = split || this.options['chunkify'];
+    split = split || this.options.chunkify;
 
     if (split) {
         split = split.split('/');
@@ -1108,7 +1122,7 @@ Test.OptionsImpl.prototype.getCurrentChunk = function(array, split) {
 
         chunks = [];
 
-        for (i = 0, len = array.length; i < len; ) {
+        for (i = 0, len = array.length; i < len;) {
             size = Math.ceil((len - i) / numChunks--);  // TODO "numChunks--" ???
             chunks.push(array.slice(i, i += size));
         }
@@ -1189,7 +1203,7 @@ Test.OptionsImpl.prototype.urlDecode = function(string) {
     var obj = {},
         pairs, name, value, pair, i, len;
     
-    if (string != "") {
+    if (string !== "") {
         pairs = string.split('&');
         
         for (i = 0, len = pairs.length; i < len; i++) {
@@ -1295,7 +1309,7 @@ Test.OptionsImpl.prototype.renderCheckbox = function(name, labelText) {
             }
         });
         
-    me.optionCheckBoxesEl[name] = checkbox; 
+    me.optionCheckBoxesEl[name] = checkbox;
       
     return new Test.Dom({
         tag: "span",
@@ -1338,8 +1352,8 @@ Test.OptionsImpl.prototype.onCheckboxClick = function(event) {
     el = event.target || event.srcElement;
     opt = el.className.split(" ")[1];
     
-    if (el.checked) { 
-       this.options[opt] = true;
+    if (el.checked) {
+        this.options[opt] = true;
     }
     else {
         delete this.options[opt];
@@ -1350,6 +1364,7 @@ Test.OptionsImpl.prototype.onCheckboxClick = function(event) {
         url = location.href;
 
         i = url.indexOf('?');
+        
         if (i > -1) {
             url = url.substr(0, i);
         }
@@ -1501,11 +1516,13 @@ Test.OptionsImpl.prototype.collectFailed = function(limit) {
     // for two or more specs and running the suite instead of the
     // individual specs.
     compressed = true;
+    
     while (specs.length > Test.MAX_INDIVIDUAL_SPECS && compressed) {
         suites = {};
 
         // Replace specs with suites
         compressed = false;
+        
         for (i = 0, len = specs.length; i < len; i++) {
             if (specs[i].getParentSuite) {
                 spec = specs[i].getParentSuite();
@@ -1514,8 +1531,10 @@ Test.OptionsImpl.prototype.collectFailed = function(limit) {
                 if (!spec.getParentSuite()) {
                     continue;
                 }
+                
                 compressed = true;
             }
+            
             suites[spec.getId()] = spec;
         }
         
@@ -1523,7 +1542,7 @@ Test.OptionsImpl.prototype.collectFailed = function(limit) {
         
         for (id in suites) {
             specs.push(suites[id]);
-        }        
+        }
     }
     
     len = limit != null ? limit : specs.length;
@@ -1534,7 +1553,7 @@ Test.OptionsImpl.prototype.collectFailed = function(limit) {
         // These will always be Spec or Suite objects
         if (spec.id) {
             options.testIds[spec.id] = spec.id;
-        }        
+        }
     }
     
     return options;
@@ -1544,10 +1563,11 @@ Test.OptionsImpl.prototype.collectFailed = function(limit) {
  * Starts autoReload task.
  */
 Test.OptionsImpl.prototype.startAutoReloadTask = function() {
-    var me = this;
+    var me = this,
+        interval;
     
     if (me.options.autoReload) {
-        var interval = setInterval(function() {
+        interval = setInterval(function() {
             if (Test.SandBox.isRunning()) {
                 clearInterval(interval);
             
@@ -1566,6 +1586,7 @@ Test.OptionsImpl.prototype.isChecked = function(o) {
 };
 
 Test.Options = new Test.OptionsImpl();
+
 Test.SandBoxImpl = function() {};
 
 Test.SandBoxImpl.prototype.domReady = function(fn) {
@@ -1575,7 +1596,7 @@ Test.SandBoxImpl.prototype.domReady = function(fn) {
     else {
         window.attachEvent('onload', fn);
     }
-};  
+};
 
 Test.SandBoxImpl.prototype.setup = function(config) {
     var me = this;
@@ -1593,7 +1614,7 @@ Test.SandBoxImpl.prototype.setup = function(config) {
 
 Test.SandBoxImpl.prototype.createIframe = function() {
     var me = this,
-        options, iframe, onIframeLoad, prop, hasTopSuites, src;
+        options, iframe, onIframeLoad, prop, hasTopSuites, src; // eslint-disable-line no-unused-vars
 
     me.options = options = Test.Options.get();
     
@@ -1629,7 +1650,7 @@ Test.SandBoxImpl.prototype.createIframe = function() {
         // start-tests.js needs a way to detect that remote driver is available.
         // Cmd is legacy API compatible with Sencha Test.
         win.Cmd = Test.Remote;
-    }
+    };
     
     // We load the specs from bootstrap-specs.js prepared by Cmd.
     // There's a big array of URLs in there, which we can filter
@@ -1649,12 +1670,12 @@ Test.SandBoxImpl.prototype.createIframe = function() {
                 // Only basic wildcards now
                 if (topSuite.substr(topSuite.length - 1) === '*') {
                     re = topSuite.replace(/\./g, '\\.');
-                    topSuiteMatchers.push(re.replace(/\*$/, '\.*$'));
+                    topSuiteMatchers.push(re.replace(/\*$/, '.*$'));
                     topSuite = topSuite.replace(/\*$/, '.*');
                 }
                 
                 topSuite = topSuite.replace(/^Ext\./, 'specs.');
-                matchers.push(topSuite + '\.js$');
+                matchers.push(topSuite + '.js$');
             }
             
             if (topSuiteMatchers.length) {
@@ -1694,7 +1715,7 @@ Test.SandBoxImpl.prototype.createIframe = function() {
     }
     
     // iOS needs this or else it will auto-size the iframe to its content
-//     iframe.scrolling = 'no'; 
+    // iframe.scrolling = 'no'; 
 
     // This will start loading
     me.reporter.getIframeContainer().appendChild(iframe);
@@ -1739,6 +1760,7 @@ Test.SandBoxImpl.prototype.iScope = function(o) {
     if (typeof o === "function") {
         o = "(" + o.toString() + ")();";
     }
+    
     return Test.SandBox.getWin().eval(o);
 };
 
@@ -1758,7 +1780,7 @@ Test.SandBoxImpl.prototype.reportProgress = function(text, callback) {
 
 Test.SandBoxImpl.prototype.setFatalError = function(error) {
     document.body.appendChild(new Test.Dom({
-        cls: 'fatal-error-mask',
+        cls: 'fatal-error-mask'
     }));
     
     document.body.appendChild(new Test.Dom({
@@ -1785,8 +1807,6 @@ Test.SandBoxImpl.prototype.setRemoteStatus = function(text) {
 };
 
 Test.SandBox = new Test.SandBoxImpl();
-var iScope = Test.SandBox.iScope;
-
 Test.panel = {};
 
 /**
@@ -1808,7 +1828,7 @@ Test.panel.Sandbox = function(config) {
  */
 Test.panel.Sandbox.prototype.render = function() {
     this.el = new Test.Dom({
-        //cls: "panel sandbox hideMe"
+        // cls: "panel sandbox hideMe"
         cls: "panel sandbox"
     });
 };
@@ -1853,7 +1873,7 @@ Test.panel.Infos.prototype.log = function(message, cls) {
  * @param {Object} config The configuration object.
  */
 Test.panel.TabPanel = function(config) {
-    var me = this;  
+    var me = this;
     
     me.options = Test.Options.get();
     
@@ -1892,7 +1912,7 @@ Test.panel.TabPanel = function(config) {
     
     me.container.appendChild(me.el);
     me.renderToolBar();
-    //me.add(new Test.panel.Infos({}));
+    // me.add(new Test.panel.Infos({}));
     me.add(new Test.panel.Sandbox({}));
     
     if (me.options.panel) {
@@ -1941,7 +1961,7 @@ Test.panel.TabPanel.prototype.addTab = function(cls, name, persist) {
     }));
     
     this.tabs.push({
-        el: el, 
+        el: el,
         persist: persist
     });
 };
@@ -1957,7 +1977,7 @@ Test.panel.TabPanel.prototype.activatePanel = function(cls) {
         
     for (i = 0; i < length; i++) {
         child = children[i].el;
-        Test.Dom.addCls(child, "hideMe"); 
+        Test.Dom.addCls(child, "hideMe");
         
         if (Test.Dom.hasCls(child, cls)) {
             Test.Dom.removeCls(child, "hideMe");
@@ -1978,8 +1998,9 @@ Test.panel.TabPanel.prototype.activatePanel = function(cls) {
  */
 Test.panel.TabPanel.prototype.onTabPanelClick = function(event) {
     var el;
-        event = event || window.event;
-        el = event.target || event.srcElement;
+    
+    event = event || window.event;
+    el = event.target || event.srcElement;
 
     if (Test.Dom.hasCls(el, "toolbarTab")) {
         this.onTabClick(el);
@@ -1991,17 +2012,16 @@ Test.panel.TabPanel.prototype.onTabPanelClick = function(event) {
  * @param {HTMLElement} el The tab HTMLElement.
  */
 Test.panel.TabPanel.prototype.onTabClick = function(el) {
-    var tools, panels, length, child, i;
+    var tools, length, child, i;
     
     Test.Dom.addCls(el, "selected");
 
     tools = this.toolbar.childNodes;
-    panels = this.body.childNodes;
 
     for (i = 0, length = tools.length; i < length; i++) {
         child = tools[i];
         
-        if (child != el) {    
+        if (child !== el) {
             Test.Dom.removeCls(child, "selected");
         }
     }
@@ -2030,15 +2050,17 @@ Test.panel.TabPanel.prototype.renderToolBar = function() {
  */
 Test.panel.TabPanel.prototype.resetToolBar = function() {
     var children = this.tabs,
-        length = children.length, 
+        length = children.length,
         child, i;
 
     for (i = length - 1; i >= 0; i--) {
         child = children[i];
+        
         if (!child.persist) {
             this.toolbar.removeChild(child.el);
             Test.array.remove(children, child);
         }
+        
         Test.Dom.removeCls(child.el, "selected");
     }
     
@@ -2050,15 +2072,17 @@ Test.panel.TabPanel.prototype.resetToolBar = function() {
  */
 Test.panel.TabPanel.prototype.resetPanels = function() {
     var children = this.children,
-        length = children.length, 
+        length = children.length,
         child, i;
 
     for (i = length - 1; i >= 0; i--) {
         child = children[i];
+        
         if (!child.persist) {
             child.remove();
             Test.array.remove(children, child);
         }
+        
         Test.Dom.addCls(child.el, "hideMe");
     }
     
@@ -2175,9 +2199,9 @@ Test.panel.TreeGrid = function(config) {
                         title: "Run only failed specs in the current set\n" +
                                "Shift-click to run only first failed spec",
                         onmousedown: function(e) {
+                            var options, limit;
+                            
                             e = e || window.event;
-                            var target = e.target || e.srcElement,
-                                options, limit;
                             
                             // Stop text selection
                             if (e.preventDefault) {
@@ -2221,7 +2245,6 @@ Test.panel.TreeGrid = function(config) {
                         title: "Run all suites and specs in the original set",
                         onmousedown: function(e) {
                             e = e || window.event;
-                            var target = e.target || e.srcElement;
 
                             e.target.href = '?' + Test.Options.formLoadUrl(true);
                         }
@@ -2232,11 +2255,13 @@ Test.panel.TreeGrid = function(config) {
                         title: "Run a chunk like TeamCity",
                         onmousedown: function(e) {
                             if (e.button === 0) {
-                                var chunk = prompt('Enter chunk descriptor (e.g., "0/3")');
+                                var chunk = prompt('Enter chunk descriptor (e.g., "0/3")'),
+                                    qs;
 
                                 // qs = 'chunkify=2%2F1';
                                 if (chunk) {
-                                    var qs = Test.Options.formLoadUrl(true);
+                                    qs = Test.Options.formLoadUrl(true);
+                                    
                                     if (qs) {
                                         qs += '&';
                                     }
@@ -2264,8 +2289,8 @@ Test.panel.TreeGrid = function(config) {
                 me.onBodyClick.apply(me, arguments);
             }
         }, {
-          cls: "resizer",
-          html: "&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;",
+            cls: "resizer",
+            html: "&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;",
             ondblclick: function(e) {
                 me.onDoubleClick(e);
             },
@@ -2287,7 +2312,7 @@ Test.panel.TreeGrid = function(config) {
     me.progressBar = me.statusMessage.childNodes[1];
     me.toolBar = me.header.childNodes[2];
     me.body = me.el.childNodes[1];
-    me.resizer = me.el.childNodes[2];    
+    me.resizer = me.el.childNodes[2];
 
     me.suites = {};
     me.specs = {};
@@ -2355,12 +2380,12 @@ Test.panel.TreeGrid.prototype.addSuite = function(suite) {
         suiteId = suite.getId(),
         disabled = suite.isDisabled(),
         prefix = disabled ? "xdescribe: " : "describe: ",
-        cls = "noexpand", 
-        suiteEl, row, property;
+        cls = "noexpand",
+        suiteEl, row, clear;
     
     if (suite.children().length !== 0) {
         cls = this.options.collapseAll ? "expand" : "collapse";
-    } 
+    }
     
     if (parent && !parent.isRootSuite) {
         if (!this.suitesEls[parent.getId()]) {
@@ -2400,7 +2425,8 @@ Test.panel.TreeGrid.prototype.addSuite = function(suite) {
     
     row.appendChild(suiteEl);
     
-    var clear = new Test.Dom({ tag: 'div' });
+    clear = new Test.Dom({ tag: 'div' });
+    
     clear.style.clear = 'both';
     row.appendChild(clear);
     
@@ -2429,7 +2455,7 @@ Test.panel.TreeGrid.prototype.addSpec = function(spec) {
         specId = spec.getId(),
         enabled = spec.isEnabled(),
         suffix = spec.time ? " (" + spec.time + "s)" : "",
-        row, clear, prefix, status, property, specEl, resultPanel;
+        row, clear, prefix, status, specEl, resultPanel;
         
     if (enabled) {
         prefix = "it ";
@@ -2493,7 +2519,7 @@ Test.panel.TreeGrid.prototype.addSpec = function(spec) {
     row.appendChild(clear);
     
     if (resultPanel.scrollHeight > 26) {
-        Test.Dom.addCls(row, 'results-collapsed')
+        Test.Dom.addCls(row, 'results-collapsed');
     }
 };
 
@@ -2520,6 +2546,7 @@ Test.panel.TreeGrid.prototype.getSpec = function(id) {
  */
 Test.panel.TreeGrid.prototype.onBodyClick = function(event) {
     event = event || window.event;
+    
     var el = event.target || event.srcElement,
         cls = el.className,
         i;
@@ -2531,22 +2558,26 @@ Test.panel.TreeGrid.prototype.onBodyClick = function(event) {
 
         if (Test.Dom.hasCls(el, "collapse")) {
             this.onCollapse(el);
+            
             return;
         }
 
         if (Test.Dom.hasCls(el, "expand")) {
             this.onExpand(el);
+            
             return;
         }
         
         if (Test.Dom.hasCls(el, "select-checkbox")) {
             this.onCheck(el);
+            
             return;
         }
         
         for (i = 0; i < 6; i++) {
             if (cls && Test.Dom.hasCls(el, "row")) {
                 this.onRowClick(el);
+                
                 return;
             }
             
@@ -2628,7 +2659,7 @@ Test.panel.TreeGrid.prototype.onEachRow = function(row, fn, recursive) {
                 }
             }
         }
-    };
+    }
     
     if (id.search("suite") !== -1) {
         suite = this.getSuite(id.replace("suite-", ""));
@@ -2691,18 +2722,20 @@ Test.panel.TreeGrid.prototype.onExpand = function(el) {
  */
 Test.panel.TreeGrid.prototype.onRowClick = function(el) {
     var rows = el.parentNode.childNodes,
-        length = rows.length, 
+        length = rows.length,
         id, i;
         
     for (i = 0; i < length; i++) {
         Test.Dom.removeCls(rows[i], "selected");
     }
+    
     Test.Dom.addCls(el, "row selected");
     id = el.childNodes[1].id;
     
     if (id.search("spec") !== -1) {
         this.tabPanel.setSpec(this.getSpec(id.replace("spec-", "")));
     }
+    
     if (id.search("suite") !== -1) {
         this.tabPanel.setSuite(this.getSuite(id.replace("suite-", "")));
     }
@@ -2716,20 +2749,20 @@ Test.panel.TreeGrid.prototype.onRowClick = function(el) {
  */
 Test.panel.TreeGrid.prototype.createRow = function(hide, o) {
     var row = this.body.appendChild(new Test.Dom({
-            tag: "div",
-            cls: "row",
-            style: {
-                display: hide ? "none" : "block" 
-            },
+        tag: "div",
+        cls: "row",
+        style: {
+            display: hide ? "none" : "block"
+        },
+        children: [{
+            cls: "checkbox-col",
             children: [{
-                cls: "checkbox-col",
-                children: [{
-                    tag: "input",
-                    cls: "select-checkbox",
-                    type: "checkbox"
-                }]
+                tag: "input",
+                cls: "select-checkbox",
+                type: "checkbox"
             }]
-        }));
+        }]
+    }));
     
     if (Test.Options.isChecked(o)) {
         row.childNodes[0].childNodes[0].checked = true;
@@ -2765,11 +2798,9 @@ Test.panel.TreeGrid.prototype.onDoubleClick = function(event) {
  * MouseDown event listener. (resizing starts)
  */
 Test.panel.TreeGrid.prototype.onMouseDown = function(event) {
-    var me = this,
-        el;
+    var me = this;
     
     event = event || window.event;
-    el = event.target || event.srcElement;
 
     if (event.preventDefault) {
         event.preventDefault();
@@ -2782,9 +2813,11 @@ Test.panel.TreeGrid.prototype.onMouseDown = function(event) {
 
     this.startHeight = this.tabPanel.el.clientHeight;
     document.body.style.cursor = "row-resize";
+    
     document.onmousemove = function(e) {
         me.onMouseMove(e);
     };
+    
     document.onmouseup = function(e) {
         me.onMouseUp(e);
     };
@@ -2794,11 +2827,11 @@ Test.panel.TreeGrid.prototype.onMouseDown = function(event) {
  * MouseDown event listener. (resize in progress)
  */
 Test.panel.TreeGrid.prototype.onMouseMove = function(event) {
-    var el, diff;
+    var diff;
+    
     if (this.pageY) {
         event = event || window.event;
-        el = event.target || event.srcElement;
-        diff = Math.max(200, this.startHeight - ((event.pageY || event.clientY)- this.pageY));
+        diff = Math.max(200, this.startHeight - ((event.pageY || event.clientY) - this.pageY));
         diff = Math.min(diff, document.body.clientHeight - 200);
         
         this.tabPanel.resize(diff);
@@ -2821,7 +2854,7 @@ Test.panel.TreeGrid.prototype.onMouseUp = function(event) {
  * @return {Number} The innerHeight.
  */
 Test.panel.TreeGrid.prototype.getInnerHeight = function() {
-   return (window.innerHeight || document.documentElement.clientHeight) - this.header.offsetTop * 2;
+    return (window.innerHeight || document.documentElement.clientHeight) - this.header.offsetTop * 2;
 };
 
 /**
@@ -2842,9 +2875,9 @@ Test.panel.TreeGrid.prototype.resizeBody = function() {
  */
 Test.panel.TreeGrid.prototype.onExpanderClick = function(resultsEl, e) {
     var el = e.target || e.srcElement,
-      expanderCollapseCls = 'expander-collapse',
-      resultsExpandedCls = 'results-expanded',
-      isCollapsed = Test.Dom.hasCls(el, expanderCollapseCls) ? 'removeCls' : 'addCls';
+        expanderCollapseCls = 'expander-collapse',
+        resultsExpandedCls = 'results-expanded',
+        isCollapsed = Test.Dom.hasCls(el, expanderCollapseCls) ? 'removeCls' : 'addCls';
 
     Test.Dom[isCollapsed](el, expanderCollapseCls);
     Test.Dom[isCollapsed](resultsEl, resultsExpandedCls);
@@ -2856,7 +2889,7 @@ Test.panel.TreeGrid.prototype.onExpanderClick = function(resultsEl, e) {
  * @return {HTMLElement} The spec results dom element.
  */
 Test.panel.TreeGrid.prototype.renderSpecResults = function(spec, expand) {
-     var me = this,
+    var me = this,
         resultItems = spec.results().items(),
         length = resultItems.length,
         resultsEl,
@@ -2959,7 +2992,7 @@ Test.panel.TreeGrid.prototype.getInfoPanel = function() {
  * @param {String} cls (optional) an extra cls to add to the message.
  */
 Test.panel.TreeGrid.prototype.log = function(message, cls) {
-    //this.getInfoPanel().log(message, cls);
+    // this.getInfoPanel().log(message, cls);
 };
 
 /**
@@ -2973,13 +3006,14 @@ Test.panel.TreeGrid.prototype.setStatus = function(message, cls) {
     if (cls) {
         Test.Dom.addCls(this.statusMessage, cls);
     }
+    
     // Some test (somehow) cause the body to scroll, so fix it
-//     document.body.scrollTop = 0;
+    // document.body.scrollTop = 0;
 };
 
 Test.panel.TreeGrid.prototype.setRemoteStatus = function(message) {
     this.remoteStatusEl.innerHTML = message;
-}
+};
 
 Test.panel.TreeGrid.prototype.setRunningSpec = function(specName) {
     this.runningSpec = specName;
@@ -3018,8 +3052,6 @@ Test.toggleDarkMode = function(ev) {
 Test.Reporter = function(config) {
     config = config || {};
 
-    var body = document.body;
-    
     this.options = Test.Options.get();
     
     if (this.options['remote-test']) {
@@ -3240,7 +3272,7 @@ Test.Reporter.prototype.reportSuiteResults = function(suite, callback) {
     
     if (suite.isEnabled()) {
         if (this.options.showTimings) {
-            suite.time = (((new Date()).getTime() - suite.startedAt.getTime())/ 1000).toFixed(3);
+            suite.time = (((new Date()).getTime() - suite.startedAt.getTime()) / 1000).toFixed(3);
         }
         
         if (this.treeGrid && this.options.showPassed && !suiteEl) {
@@ -3339,21 +3371,22 @@ Test.Reporter.prototype.reportSpecResults = function(spec, callback) {
                         message: item.message
                     };
                     
-                    msg.details
-                        = item.error && item.trace ? item.error + ' ' + item.trace.stack
-                        : item.error               ? item.error
-                        : item.trace               ? item.trace
-                        :                            null
-                        ;
+                    /* eslint-disable indent */
+                    msg.details = item.error && item.trace ? item.error + ' ' + item.trace.stack
+                                : item.error               ? item.error
+                                : item.trace               ? item.trace
+                                :                            null
+                                ;
+                    /* eslint-enable indent */
                     
                     if (msg.details == null) {
                         delete msg.details;
                     }
                     
-//                     if (item.type === 'expect') {
-//                         msg.actual = item.actual;
-//                         msg.expected = item.expected;
-//                     }
+                    // if (item.type === 'expect') {
+                    //     msg.actual = item.actual;
+                    //     msg.expected = item.expected;
+                    // }
                     
                     Test.Remote.queueMessage(msg);
                 }
@@ -3416,7 +3449,7 @@ Test.Reporter.prototype.renderResults = function(runner) {
         runTime = (new Date().getTime() - this.startedAt.getTime()) / 1000;
     
         message = this.runnedSpecsCount + " spec" +
-                  (this.runnedSpecsCount === 1 ? "" : "s" ) + " ran, " +
+                  (this.runnedSpecsCount === 1 ? "" : "s") + " ran, " +
                   this.failedSpecsCount + " failure" +
                   (this.failedSpecsCount === 1 ? "" : "s") +
                   " and " + this.disabledSpecsCount + " disabled " +
@@ -3430,7 +3463,7 @@ Test.Reporter.prototype.renderResults = function(runner) {
     }
 };
 
-Test.Reporter.prototype.log = function() {        
+Test.Reporter.prototype.log = function() {
     if (this.options.verbose || arguments.length === 2) {
         this.logger.log.apply(this.logger, arguments);
     }
@@ -3457,6 +3490,7 @@ Test.Reporter.prototype.getIframeContainer = function() {
     if (this.treeGrid) {
         return this.treeGrid.tabPanel.children[0].el;
     }
+    
     return document.body;
 };
 

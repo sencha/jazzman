@@ -56,7 +56,10 @@ module.exports = (printStdout, printStderr) => {
                 catch (e) {
                     // Might not exist yet
                     if (e.code !== 'ENOENT') {
-                        printStderr(`ERROR: Failed to read pid file for process ${child.pid}: ${e}`);
+                        printStderr(
+                            `ERROR: Failed to read pid file for process ${child.pid}: ${e}`
+                        );
+                        
                         fail();
                         
                         return;
@@ -100,6 +103,7 @@ module.exports = (printStdout, printStderr) => {
     const stop_process = async (child, timeout) => {
         if (child.killed) {
             printStderr(`Process ${child.pid} is already stopped!`);
+            
             return true;
         }
         
@@ -194,5 +198,5 @@ module.exports = (printStdout, printStderr) => {
     return {
         start_process,
         stop_process,
-    }
+    };
 };

@@ -19,7 +19,7 @@ const _promisify = (stream) => {
                 });
             }
         });
-    }
+    };
 };
 
 const printStdout = _promisify(process.stdout);

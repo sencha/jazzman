@@ -5,10 +5,12 @@ topSuite("Ext.jazzman.leaks.Globals", [false], function() {
     (Ext.isIE8m ? xdescribe : describe)("implicit global variables", function() {
         todo().
         it("should fail when spec leaves a var", function() {
+            // eslint-disable-next-line no-undef
             foo = 'blerg';
         });
         
         it("should not fail when var was declared and deleted", function() {
+            // eslint-disable-next-line no-undef
             foo = 'blerg';
             delete window.foo;
         });

@@ -43,22 +43,22 @@ topSuite("Ext.jazzman.ToDo", [false], function() {
         expect('whatever').toBe('whichever');
     });
     
-    toDo(function() { return ready; }).
+    toDo(function() { return ready }).
     it("should fail but report passed", function() {
         expect(0).toBe(1);
     });
     
-    toDo(function() { return ready; }).
+    toDo(function() { return ready }).
     it("should pass but report failed", function() {
         expect(1).toBe(1);
     });
     
-    toDo(function() { return !ready; }).
+    toDo(function() { return !ready }).
     it("should pass and report passed", function() {
         expect('foo').toBe('foo');
     });
     
-    toDo(function() { return !ready; }).
+    toDo(function() { return !ready }).
     it("should fail and report failed", function() {
         expect('foo').toBe('bar');
     });
@@ -86,7 +86,7 @@ topSuite("Ext.jazzman.ToDo", [false], function() {
         });
     });
     
-    toDo(function() { return ready; }).
+    toDo(function() { return ready }).
     describe("some specs fail in this suite, should be reported as passed", function() {
         it("passes", function() {
             expect(null).toBe(null);
@@ -97,9 +97,8 @@ topSuite("Ext.jazzman.ToDo", [false], function() {
         });
     });
     
-    toDo(function() { return ready; }).
-    describe("delayed resolution: all specs pass in this suite, should be reported as failed",
-    function() {
+    toDo(function() { return ready }).
+    describe("delayed resolution: all specs pass in this suite, should be reported as failed", function() {
         it("should pass 3", function() {
             expect(undefined).toBe(undefined);
         });
@@ -109,7 +108,7 @@ topSuite("Ext.jazzman.ToDo", [false], function() {
         });
     });
     
-    toDo(function() { return !ready; }).
+    toDo(function() { return !ready }).
     describe("all specs pass in this suite, should be reported normally as passed", function() {
         it("should pass 5", function() {
             expect(false).toBe(false);
@@ -120,7 +119,7 @@ topSuite("Ext.jazzman.ToDo", [false], function() {
         });
     });
     
-    toDo(function() { return !ready; }).
+    toDo(function() { return !ready }).
     describe("one spec fails in this suite, should be reported normally as failed", function() {
         it("should pass 7", function() {
             expect('black').toBe('black');
@@ -152,7 +151,7 @@ topSuite("Ext.jazzman.ToDo", [false], function() {
         });
     });
     
-    toDo("fumble", function() { return ready; }).
+    toDo("fumble", function() { return ready }).
     describe("deferred resolution, should be todo and report as passed", function() {
         it("should pass 10", function() {
             expect(true).toBe(true);

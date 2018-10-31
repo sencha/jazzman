@@ -34,6 +34,7 @@ const parseArgs = (args, defaults) => [
 const parseJsonOpts = (str, defaults) => {
     try {
         const opts = JSON.parse(str);
+        
         return { ...defaults, ...opts };
     }
     catch (e) {
@@ -49,25 +50,25 @@ const options = [
     ['--listen-host <hostname>', 'Host name or IP address to listen on', /.*/, '*'],
     ['--listen-port <port>', 'Port number to listen on', v => +v, 8888],
     ['--public-host <hostname>', 'Host name or IP address to use in test subject URLs',
-        /.*/, 'localhost'],
+     /.*/, 'localhost'],
     ['--public-port <port>', 'Port number to use in test subject URLs', v => +v],
     ['--concurrency <number>', 'Max number of concurrent sessions', v => +v, 0],
     ['--ping-interval <ms>', 'Interval between browser keepalive pings', v => +v, 30000],
     ['--ping-timeout <ms>', 'Browser ping timeout', v => +v, 30000],
     ['--test-start-timeout <ms>', 'Interval to wait for tests to start in browser',
-        v => +v, 300000],
+     v => +v, 300000],
     ['--static-root <path>', 'Path to static document root directory', v => fs.realpathSync(v)],
     ['--nginx-path <path>', 'Path to Nginx binary', v => fs.realpathSync(v)],
     ['--nginx-args <string>', 'Additional Nginx command line arguments (in quotes)',
-        parseArgs, defaults.nginx.args],
+     parseArgs, defaults.nginx.args],
     ['--nginx-timeout <ms>', 'Time to allow Nginx to start', v => +v, defaults.nginx.timeout],
     ['--sauce-connect-path <path>', 'Path to SauceConnect binary', v => fs.realpathSync(v)],
     ['--sauce-connect-args <string>', 'Additional SauceConnect command line arguments (in quotes)',
-        parseArgs, defaults.sauceConnect.args],
+     parseArgs, defaults.sauceConnect.args],
     ['--sauce-connect-timeout <ms>', 'Time to allow SauceConnect to start', v => +v,
-        defaults.sauceConnect.timeout],
+     defaults.sauceConnect.timeout],
     ['--session-options <json>', 'Additional session options (JSON string)',
-        parseJsonOpts, defaults.sessionOptions],
+     parseJsonOpts, defaults.sessionOptions],
     ['--enforce-test-plan', 'Track planned vs executed test specs and fail on mismatch'],
 ];
 

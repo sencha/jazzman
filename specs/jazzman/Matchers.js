@@ -71,8 +71,8 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
         });
     });
 
-    describe('toHaveProperty', function () {
-        it('should return true if target has property', function () {
+    describe('toHaveProperty', function() {
+        it('should return true if target has property', function() {
             var target = {
                 foo: 'bar'
             };
@@ -80,15 +80,15 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
             expect(target).toHaveProperty('foo');
         });
 
-        it('should return true if target has property as function', function () {
+        it('should return true if target has property as function', function() {
             var target = {
-                foo: function () {}
+                foo: function() {}
             };
 
             expect(target).toHaveProperty('foo');
         });
 
-        it('should return true if target has property as undefined', function () {
+        it('should return true if target has property as undefined', function() {
             var target = {
                 foo: undefined
             };
@@ -96,7 +96,7 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
             expect(target).toHaveProperty('foo');
         });
 
-        it('should return true if target does not have property', function () {
+        it('should return true if target does not have property', function() {
             var target = {
                 foo: 'bar'
             };
@@ -105,8 +105,8 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
         });
     });
 
-    describe('toHaveProperties', function () {
-        it('should return true if target has a property', function () {
+    describe('toHaveProperties', function() {
+        it('should return true if target has a property', function() {
             var target = {
                 foo: 'bar'
             };
@@ -114,7 +114,7 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
             expect(target).toHaveProperties('foo');
         });
 
-        it('should return true if target has all properties', function () {
+        it('should return true if target has all properties', function() {
             var target = {
                 foo: undefined,
                 bar: undefined
@@ -124,7 +124,7 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
         });
         
         TODO(true, 'This spec should always fail').
-        it('should fail if one property is missing', function () {
+        it('should fail if one property is missing', function() {
             var target = {
                 foo: 'bar'
             };
@@ -132,7 +132,7 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
             expect(target).toHaveProperties('foo', 'bar');
         });
 
-        it('should return true if target does not have a property', function () {
+        it('should return true if target does not have a property', function() {
             var target = {
                 foo: 'bar'
             };
@@ -140,7 +140,7 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
             expect(target).not.toHaveProperties('bar');
         });
 
-        it('should return true if target does not have all properties', function () {
+        it('should return true if target does not have all properties', function() {
             var target = {
                 foo: 'bar'
             };
@@ -149,7 +149,7 @@ topSuite("Ext.jazzman.Matchers", [false], function() {
         });
         
         TODO(true, 'This spec should always fail').
-        it('should fail if target has one property', function () {
+        it('should fail if target has one property', function() {
             var target = {
                 foo: 'bar'
             };

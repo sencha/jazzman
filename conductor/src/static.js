@@ -1,12 +1,11 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 
 // Nginx has a nasty habit of trying to open error_log at hardcoded path immediately
 // after starting, before any configuration kicked in. This path usually is not
 // world-writable so Nginx will complain loudly.
-// It also is _ridiculously_ verbose. I mean, [error] log entry on every ENOENT? Srsly?
+// It is also _ridiculously_ verbose. Srsly, [error] log entry on every ENOENT?
 const stderr_filter_re = new RegExp(
     '^[^\\[]+' +
         '(?:' +
@@ -25,7 +24,7 @@ module.exports = (app, options) => {
         const { path, args, timeout } = options.nginx;
         const conf_text = get_nginx_conf(options, pid_file);
         
-        // Node fs is missing mkstemp method anyway... Lameness alert.
+        // Node fs is missing mkstemp
         const nginx_conf = `/tmp/nginx-${process.pid}.conf`;
         
         fs.writeFileSync(nginx_conf, conf_text);
@@ -45,8 +44,7 @@ module.exports = (app, options) => {
             onStderr: (lines) => {
                 lines.split('\n').forEach(line => {
                     if (line !== '' && !stderr_filter_re.test(line)) {
-                        // We don't need to wait until this is printed, just fire off
-                        // and let stdout sort them!
+                        // We don't need to wait until this is printed
                         printStderr(`Nginx stderr output: ${line}`);
                     }
                 });
@@ -78,8 +76,8 @@ module.exports = (app, options) => {
 
     let nginx;
     
-    const appListen = app.listen,
-          appClose = app.close;
+    const appListen = app.listen;
+    const appClose = app.close;
     
     app.listen = async (port, cb) => {
         if (options.nginx.path) {
@@ -93,7 +91,7 @@ module.exports = (app, options) => {
                 await printStderr(`Failed to start Nginx server. Falling back to ` +
                                   `Express server with document root at ${options.staticRoot}`);
                 options.listenPort = port;
-            };
+            }
         }
         else {
             await printStdout(`Using Express static server with document root ` +
@@ -139,6 +137,7 @@ module.exports = (app, options) => {
 };
 
 // Keep it down for readability but hoist so it's visible from above
+// eslint-disable-next-line vars-on-top
 var get_nginx_conf = (options, pid_file) => {
     if (!options.listenHost || !options.listenPort) {
         throw new Error("listenHost and listenPort options are mandatory!");
@@ -163,9 +162,9 @@ var get_nginx_conf = (options, pid_file) => {
     options.listenHost = '127.0.0.1';
     options.listenPort = nginxPort + 10000;
     
-    const postBodyLimit = (options.postBodyLimit || '10mb').
-                          replace(/mb/i, 'M').
-                          replace(/kb/i, 'k');
+    const postBodyLimit = (options.postBodyLimit || '10mb')
+                          .replace(/mb/i, 'M')
+                          .replace(/kb/i, 'k');
     
     return `\
 error_log stderr crit;
